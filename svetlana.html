@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Светлана Лоза — Автоматизация для коучей и ведущих</title>
+  <meta name="description" content="Автоматизирую рутину для ведущих трансформационных игр и коучей. Была ведущей сама — знаю изнутри что съедает время.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0d0b09;
+      --bg2:     #131110;
+      --bg3:     #1a1714;
+      --border:  rgba(255, 248, 235, 0.07);
+      --text:    #ede8df;
+      --muted:   #7d7468;
+      --subtle:  #3d3830;
+      --accent:  #e8794a;
+      --glow:    rgba(232, 121, 74, 0.15);
+      --gold:    #c9a96e;
+      --display: 'Cormorant Garamond', Georgia, serif;
+      --body:    'Manrope', system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Grain overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: -100px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.032;
+      pointer-events: none;
+      z-index: 9999;
+      animation: grain 8s steps(10) infinite;
+    }
+    @keyframes grain {
+      0%,100% { transform: translate(0,0) }
+      10% { transform: translate(-2%,-3%) }
+      20% { transform: translate(3%,2%) }
+      30% { transform: translate(-1%,3%) }
+      40% { transform: translate(3%,-1%) }
+      50% { transform: translate(-3%,2%) }
+      60% { transform: translate(2%,-3%) }
+      70% { transform: translate(1%,3%) }
+      80% { transform: translate(-2%,1%) }
+      90% { transform: translate(2%,-1%) }
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ── SCROLL ANIMATIONS ── */
+    [data-fade] {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.8s cubic-bezier(0.22,1,0.36,1),
+                  transform 0.8s cubic-bezier(0.22,1,0.36,1);
+    }
+    [data-fade].in {
+      opacity: 1;
+      transform: none;
+    }
+    [data-fade][data-d="1"] { transition-delay: 0.1s; }
+    [data-fade][data-d="2"] { transition-delay: 0.2s; }
+    [data-fade][data-d="3"] { transition-delay: 0.3s; }
+    [data-fade][data-d="4"] { transition-delay: 0.4s; }
+    [data-fade][data-d="5"] { transition-delay: 0.5s; }
+
+    /* ── LAYOUT ── */
+    .wrap {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 22px 0;
+      transition: background 0.4s, backdrop-filter 0.4s;
+    }
+    nav.scrolled {
+      background: rgba(13, 11, 9, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-name {
+      font-family: var(--display);
+      font-size: 20px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      color: var(--text);
+    }
+    .nav-name span {
+      color: var(--accent);
+    }
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--body);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 9px 18px;
+      border-radius: 50px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .nav-cta:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      padding: 120px 0 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-orb {
+      position: absolute;
+      top: -100px; right: -100px;
+      width: 700px; height: 700px;
+      background: radial-gradient(circle at 40% 40%,
+        rgba(232,121,74,0.12) 0%,
+        rgba(201,169,110,0.05) 40%,
+        transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: orbPulse 8s ease-in-out infinite;
+    }
+    @keyframes orbPulse {
+      0%,100% { transform: scale(1) translate(0,0); opacity: 1; }
+      50% { transform: scale(1.1) translate(-30px, 20px); opacity: 0.7; }
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 80px;
+      align-items: center;
+      position: relative;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 28px;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 28px; height: 1px;
+      background: var(--gold);
+    }
+
+    .hero h1 {
+      font-family: var(--display);
+      font-size: clamp(48px, 7vw, 78px);
+      font-weight: 500;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+    }
+    .hero h1 .line-accent {
+      font-style: italic;
+      color: var(--accent);
+      display: block;
+    }
+
+    .hero-divider {
+      width: 48px; height: 1px;
+      background: var(--subtle);
+      margin: 28px 0;
+    }
+
+    .hero-sub {
+      font-size: 17px;
+      font-weight: 300;
+      color: #9d9088;
+      line-height: 1.75;
+      max-width: 440px;
+      margin-bottom: 40px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-family: var(--body);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 13px 26px;
+      border-radius: 50px;
+      letter-spacing: 0.01em;
+      transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 0 0 0 rgba(232,121,74,0);
+    }
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(232,121,74,0.25);
+    }
+
+    .btn-text {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+    .btn-text:hover { color: var(--text); }
+    .btn-text .arrow {
+      transition: transform 0.2s;
+    }
+    .btn-text:hover .arrow { transform: translateX(4px); }
+
+    /* Hero photo */
+    .hero-photo-wrap {
+      position: relative;
+    }
+    .hero-photo-frame {
+      position: relative;
+      border-radius: 4px 24px 4px 24px;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px var(--border),
+        0 40px 80px rgba(0,0,0,0.5);
+    }
+    .hero-photo-frame img {
+      width: 100%;
+      border-radius: 4px 24px 4px 24px;
+      display: block;
+    }
+    .hero-photo-frame::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        160deg,
+        transparent 40%,
+        rgba(13,11,9,0.6) 100%
+      );
+    }
+    .hero-photo-badge {
+      position: absolute;
+      bottom: 24px;
+      left: -24px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 16px 32px rgba(0,0,0,0.4);
+      z-index: 2;
+    }
+    .hero-photo-badge .badge-num {
+      font-family: var(--display);
+      font-size: 32px;
+      font-weight: 600;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .hero-photo-badge .badge-text {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+      max-width: 120px;
+    }
+
+    /* ── SECTION UTILITIES ── */
+    section { padding: 100px 0; }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    .eyebrow::before {
+      content: '';
+      display: block;
+      width: 24px; height: 1px;
+      background: var(--gold);
+    }
+
+    .display-title {
+      font-family: var(--display);
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 500;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      margin-bottom: 18px;
+    }
+    .display-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .section-sub {
+      font-size: 16px;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.75;
+      max-width: 500px;
+    }
+
+    /* ── STORY ── */
+    #story {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .story-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .story-left {
+      position: sticky;
+      top: 100px;
+    }
+
+    .story-quote {
+      font-family: var(--display);
+      font-size: clamp(26px, 3vw, 36px);
+      font-style: italic;
+      font-weight: 400;
+      line-height: 1.35;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+    .story-quote em {
+      color: var(--accent);
+      font-style: normal;
+    }
+
+    .story-caption {
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: 0.03em;
+    }
+
+    .story-right p {
+      font-size: 17px;
+      font-weight: 300;
+      color: #b0a89e;
+      line-height: 1.85;
+      margin-bottom: 24px;
+    }
+    .story-right p:last-child { margin-bottom: 0; }
+    .story-right strong { color: var(--text); font-weight: 500; }
+
+    .story-numbers {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 40px;
+    }
+    .story-number-item {
+      background: var(--bg3);
+      padding: 24px 20px;
+      text-align: center;
+    }
+    .story-number-item .n-val {
+      font-family: var(--display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .story-number-item .n-label {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    /* ── SERVICES ── */
+    .services-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 56px;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .service-card {
+      background: var(--bg2);
+      padding: 36px 32px;
+      position: relative;
+      transition: background 0.25s;
+    }
+    .service-card:hover { background: var(--bg3); }
+
+    .service-num {
+      font-family: var(--display);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--subtle);
+      letter-spacing: 0.08em;
+      margin-bottom: 32px;
+    }
+
+    .service-icon-wrap {
+      width: 44px; height: 44px;
+      background: var(--accent-light, rgba(232,121,74,0.1));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+
+    .service-card h3 {
+      font-family: var(--display);
+      font-size: 22px;
+      font-weight: 500;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    .service-card p {
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .service-line {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
+    }
+    .service-card:hover .service-line { transform: scaleX(1); }
+
+    /* ── CASE ── */
+    #case {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+    }
+
+    .case-wrap {
+      margin-top: 56px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .case-top {
+      padding: 48px 48px 40px;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .case-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+    .case-tag::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .case-top h3 {
+      font-family: var(--display);
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 500;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .case-top p {
+      font-size: 16px;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.75;
+      max-width: 560px;
+    }
+
+    .case-flow-row {
+      display: grid;
+      grid-template-columns: 1fr 40px 1fr 40px 1fr;
+      gap: 0;
+      align-items: center;
+      padding: 40px 48px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .flow-node {
+      text-align: center;
+      padding: 24px 16px;
+    }
+    .flow-node .fn-icon {
+      font-size: 28px;
+      margin-bottom: 10px;
+      display: block;
+    }
+    .flow-node .fn-title {
+      font-family: var(--display);
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+    .flow-node .fn-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .flow-sep {
+      text-align: center;
+      color: var(--accent);
+      font-size: 18px;
+    }
+
+    .case-results-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+    }
+    .case-result {
+      background: var(--bg2);
+      padding: 28px 32px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .case-result .cr-icon {
+      color: var(--accent);
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .case-result span {
+      font-size: 14px;
+      font-weight: 300;
+      color: #b0a89e;
+      line-height: 1.6;
+    }
+    .case-result strong { color: var(--text); font-weight: 500; }
+
+    /* ── FOR WHO ── */
+    .forwho-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 56px;
+    }
+
+    .forwho-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 26px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      transition: border-color 0.2s;
+    }
+    .forwho-card:hover { border-color: rgba(232,121,74,0.2); }
+
+    .forwho-marker {
+      width: 7px; height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 8px;
+    }
+
+    .forwho-card p {
+      font-size: 15px;
+      font-weight: 300;
+      color: #b0a89e;
+      line-height: 1.65;
+    }
+
+    /* ── CTA ── */
+    #cta {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-orb {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 600px;
+      background: radial-gradient(circle,
+        rgba(232,121,74,0.07) 0%,
+        transparent 65%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .cta-inner {
+      max-width: 620px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-quote {
+      font-family: var(--display);
+      font-size: clamp(24px, 3.5vw, 38px);
+      font-style: italic;
+      font-weight: 400;
+      line-height: 1.35;
+      color: var(--text);
+      margin-bottom: 28px;
+    }
+    .cta-quote em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .cta-sub {
+      font-size: 16px;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.75;
+      margin-bottom: 40px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 28px 0;
+      border-top: 1px solid var(--border);
+    }
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    footer p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    footer a {
+      color: var(--gold);
+      transition: color 0.2s;
+    }
+    footer a:hover { color: var(--accent); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 860px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 48px;
+      }
+      .hero-photo-wrap { order: -1; max-width: 300px; margin: 0 auto; }
+      .hero-photo-badge { left: -10px; }
+
+      .story-grid {
+        grid-template-columns: 1fr;
+        gap: 48px;
+      }
+      .story-left { position: static; }
+
+      .services-grid { grid-template-columns: 1fr; }
+
+      .case-flow-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+        padding: 28px 24px;
+      }
+      .flow-sep { transform: rotate(90deg); padding: 8px 0; }
+
+      .case-top { padding: 32px 24px 28px; }
+      .case-results-row { grid-template-columns: 1fr; }
+
+      .forwho-grid { grid-template-columns: 1fr; }
+
+      .services-header { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (max-width: 520px) {
+      section { padding: 72px 0; }
+      .story-numbers { grid-template-columns: 1fr; }
+      .hero-actions { flex-direction: column; align-items: flex-start; }
+      .footer-inner { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="wrap">
+    <div class="nav-inner">
+      <span class="nav-name">Светлана<span> Лоза</span></span>
+      <a href="https://t.me/SvetlanaLoza" target="_blank" rel="noopener" class="nav-cta">
+        ✈ Написать
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-orb"></div>
+  <div class="wrap">
+    <div class="hero-grid">
+
+      <div class="hero-content">
+        <div class="hero-eyebrow" data-fade>
+          Автоматизация для коучей и ведущих
+        </div>
+        <h1 data-fade data-d="1">
+          Рутина съедает<br>твоё время.
+          <span class="line-accent">Я это исправлю.</span>
+        </h1>
+        <div class="hero-divider" data-fade data-d="2"></div>
+        <p class="hero-sub" data-fade data-d="2">
+          Была ведущей «Территории денег». Знаю изнутри что отнимает часы
+          после каждой сессии. Теперь строю ИИ-инструменты, которые
+          делают это вместо тебя.
+        </p>
+        <div class="hero-actions" data-fade data-d="3">
+          <a href="https://t.me/SvetlanaLoza" target="_blank" rel="noopener" class="btn-primary">
+            ✈ Написать в Telegram
+          </a>
+          <a href="#case" class="btn-text">
+            Смотреть кейс <span class="arrow">→</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-photo-wrap" data-fade data-d="2">
+        <div class="hero-photo-frame">
+          <img src="photo_small.jpg" alt="Светлана Лоза">
+        </div>
+        <div class="hero-photo-badge">
+          <div class="badge-num">3 мин</div>
+          <div class="badge-text">вместо часов ручной работы</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- STORY -->
+<section id="story">
+  <div class="wrap">
+    <div class="story-grid">
+
+      <div class="story-left" data-fade>
+        <div class="eyebrow">История</div>
+        <p class="story-quote">
+          «Хотела зарабатывать больше —
+          но упиралась в <em>потолок.</em>
+          Рутина съедала всё.»
+        </p>
+        <p class="story-caption">— Светлана Лоза, ведущая → автоматизатор</p>
+      </div>
+
+      <div class="story-right">
+        <p data-fade>
+          Несколько лет проводила трансформационные игры «Территория денег».
+          После каждой сессии — <strong>часы ручной работы</strong>: анализировала бланки,
+          писала персональные планы для игроков, вела переписку, напоминала о встречах,
+          выставляла счета.
+        </p>
+        <p data-fade data-d="1">
+          Хотела принять больше клиентов — но упиралась в потолок. Больше сессий
+          физически не помещалось. <strong>Рутина съедала время, которое можно было
+          тратить на то, что реально приносит деньги.</strong>
+        </p>
+        <p data-fade data-d="2">
+          Изучила ИИ и no-code инструменты. Оказалось — большую часть этой рутины
+          можно автоматизировать. Теперь я помогаю ведущим и коучам сделать то же самое.
+          <strong>Без технических знаний с их стороны.</strong>
+        </p>
+
+        <div class="story-numbers" data-fade data-d="3">
+          <div class="story-number-item">
+            <div class="n-val">3 мин</div>
+            <div class="n-label">вместо 30–60 мин на одного клиента</div>
+          </div>
+          <div class="story-number-item">
+            <div class="n-val">под ключ</div>
+            <div class="n-label">рассказываешь — я строю и сдаю</div>
+          </div>
+          <div class="story-number-item">
+            <div class="n-val">изнутри</div>
+            <div class="n-label">понимаю твою работу, была там сама</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="wrap">
+    <div class="services-header">
+      <div>
+        <div class="eyebrow" data-fade>Что я делаю</div>
+        <h2 class="display-title" data-fade data-d="1">
+          Автоматизация<br><em>под ключ</em>
+        </h2>
+      </div>
+      <p class="section-sub" data-fade data-d="2">
+        Ты объясняешь что болит —<br>
+        я строю решение без твоего участия в технике.
+      </p>
+    </div>
+
+    <div class="services-grid">
+      <div class="service-card" data-fade>
+        <div class="service-num">01</div>
+        <div class="service-icon-wrap">🤖</div>
+        <h3>ИИ-ассистенты</h3>
+        <p>Анализируют данные сессий, пишут планы и резюме для клиентов — без твоего участия</p>
+        <div class="service-line"></div>
+      </div>
+      <div class="service-card" data-fade data-d="1">
+        <div class="service-num">02</div>
+        <div class="service-icon-wrap">💬</div>
+        <h3>Чат-боты</h3>
+        <p>Автоматически отвечают клиентам, записывают на сессии, напоминают о встречах</p>
+        <div class="service-line"></div>
+      </div>
+      <div class="service-card" data-fade data-d="2">
+        <div class="service-num">03</div>
+        <div class="service-icon-wrap">⚙️</div>
+        <h3>Автоматизация процессов</h3>
+        <p>Связываю нужные инструменты — документы, мессенджеры, расписание — всё работает само</p>
+        <div class="service-line"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CASE -->
+<section id="case">
+  <div class="wrap">
+    <div class="eyebrow" data-fade>Первый кейс</div>
+    <h2 class="display-title" data-fade data-d="1">
+      Уже <em>в разработке</em>
+    </h2>
+
+    <div class="case-wrap" data-fade data-d="2">
+
+      <div class="case-top">
+        <span class="case-tag">В разработке</span>
+        <h3>ИИ-ассистент для ведущих<br>«Территории денег»</h3>
+        <p>
+          После игровой сессии ведущий вручную анализирует бланки 6–8 игроков
+          и пишет персональный план каждому. Это 3–4 часа работы после и без того
+          насыщенной сессии.
+        </p>
+      </div>
+
+      <div class="case-flow-row">
+        <div class="flow-node">
+          <span class="fn-icon">📸</span>
+          <div class="fn-title">Фото бланка</div>
+          <div class="fn-desc">Ведущий фотографирует заполненный бланк игрока</div>
+        </div>
+        <div class="flow-sep">→</div>
+        <div class="flow-node">
+          <span class="fn-icon">🧠</span>
+          <div class="fn-title">ИИ анализирует</div>
+          <div class="fn-desc">Читает рукопись, находит паттерны, интерпретирует карты</div>
+        </div>
+        <div class="flow-sep">→</div>
+        <div class="flow-node">
+          <span class="fn-icon">📋</span>
+          <div class="fn-title">Готовый план</div>
+          <div class="fn-desc">30-дневный трек действий — пересылай игроку без правок</div>
+        </div>
+      </div>
+
+      <div class="case-results-row">
+        <div class="case-result">
+          <span class="cr-icon">✦</span>
+          <span><strong>1–2 минуты</strong> вместо 30–60 на одного игрока</span>
+        </div>
+        <div class="case-result">
+          <span class="cr-icon">✦</span>
+          <span>Готовый текст — <strong>не нужно редактировать</strong></span>
+        </div>
+        <div class="case-result">
+          <span class="cr-icon">✦</span>
+          <span>История всех сессий <strong>сохраняется автоматически</strong></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FOR WHO -->
+<section id="forwho">
+  <div class="wrap">
+    <div class="eyebrow" data-fade>Для кого</div>
+    <h2 class="display-title" data-fade data-d="1">
+      Тебе подойдёт,<br><em>если...</em>
+    </h2>
+    <div class="forwho-grid">
+      <div class="forwho-card" data-fade>
+        <div class="forwho-marker"></div>
+        <p>Ты ведущий трансформационных игр и тонешь в обработке итогов каждой сессии</p>
+      </div>
+      <div class="forwho-card" data-fade data-d="1">
+        <div class="forwho-marker"></div>
+        <p>Ты коуч или психолог, и рутина отнимает время, которое мог бы тратить на клиентов</p>
+      </div>
+      <div class="forwho-card" data-fade data-d="2">
+        <div class="forwho-marker"></div>
+        <p>Ты чувствуешь потолок дохода — сессий столько, сколько успеваешь, и не больше</p>
+      </div>
+      <div class="forwho-card" data-fade data-d="3">
+        <div class="forwho-marker"></div>
+        <p>Слышала про ИИ и автоматизацию, но не понимаешь как это применить именно в своём бизнесе</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="cta-orb"></div>
+  <div class="wrap">
+    <div class="cta-inner">
+      <div class="eyebrow" data-fade style="justify-content: center;">Следующий шаг</div>
+      <p class="cta-quote" data-fade data-d="1">
+        «Расскажи что съедает время —
+        я скажу, что из этого
+        <em>можно автоматизировать.</em>»
+      </p>
+      <p class="cta-sub" data-fade data-d="2">
+        Напиши в Telegram. Разберём твою ситуацию и я скажу
+        как это выглядело бы в твоём конкретном случае.
+      </p>
+      <a href="https://t.me/SvetlanaLoza" target="_blank" rel="noopener" class="btn-primary" data-fade data-d="3">
+        ✈ Написать Светлане
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <p>© 2026 Светлана Лоза</p>
+      <p><a href="https://t.me/SvetlanaLoza" target="_blank" rel="noopener">@SvetlanaLoza</a></p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Nav scroll effect
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  }, { passive: true });
+
+  // Scroll-triggered fade animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('[data-fade]').forEach(el => {
+    // Hero elements visible immediately
+    if (el.closest('#hero')) {
+      setTimeout(() => el.classList.add('in'), 100 + (parseInt(el.dataset.d || 0) * 120));
+    } else {
+      observer.observe(el);
+    }
+  });
+</script>
+
+</body>
+</html>
